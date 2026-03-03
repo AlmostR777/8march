@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>8 März</title>
+
+<style>
+body {
+    margin: 0;
+    background: black;
+    color: #8b0000;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+}
+
+.container {
+    max-width: 700px;
+    animation: fadeIn 1.5s ease-in-out;
+}
+
+input {
+    padding: 10px;
+    margin-top: 20px;
+    background: black;
+    border: 1px solid #8b0000;
+    color: #8b0000;
+}
+
+button {
+    padding: 10px 20px;
+    margin-top: 15px;
+    background: #8b0000;
+    border: none;
+    color: black;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: red;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+</style>
+</head>
+<body>
+
+<div class="container" id="screen">
+    <h2>Liebe beginnt nicht mit Worten...</h2>
+    <button onclick="next()">Weiter</button>
+</div>
+
+<audio id="music"></audio>
+<audio id="heartbeat" src="heartbeat.mp3"></audio>
+
+<script>
+
+let step = 0;
+let letters = "";
+
+function next() {
+    const screen = document.getElementById("screen");
+    step++;
+
+    if(step === 1){
+        document.getElementById("music").src = "track1.mp3";
+        document.getElementById("music").play();
+
+        screen.innerHTML = `
+        <h2>Прослушай аудио и угадай название песни</h2>
+        <button onclick="replay('track1.mp3')">▶ Слушать ещё раз</button>
+        <br>
+        <input id="answer">
+        <br>
+        <button onclick="check('sonne','H')">Ответить</button>
+        `;
+    }
+
+    else if(step === 2){
+        screen.innerHTML = `
+        <h2>Что означает слово "Fernweh"?</h2>
+        <input id="answer">
+        <br>
+        <button onclick="check('тоска по путешествиям','E')">Ответить</button>
+        `;
+    }
+
+    else if(step === 3){
+        screen.innerHTML = `
+        <h2>В каком городе образовалась группа?</h2>
+        <input id="answer">
+        <br>
+        <button onclick="check('berlin','R')">Ответить</button>
+        `;
+    }
+
+    else if(step === 4){
+        document.getElementById("music").src = "track2.mp3";
+        document.getElementById("music").play();
+
+        screen.innerHTML = `
+        <h2>Прослушай аудио и угадай название песни</h2>
+        <button onclick="replay('track2.mp3')">▶ Слушать ещё раз</button>
+        <br>
+        <input id="answer">
+        <br>
+        <button onclick="check('engel','Z')">Ответить</button>
+        `;
+    }
+
+    else if(step === 5){
+        screen.innerHTML = `
+        <h2>Как переводится слово "Herz"?</h2>
+        <input id="answer">
+        <br>
+        <button onclick="check('сердце','L')">Ответить</button>
+        `;
+    }
+
+    else if(step === 6){
+        screen.innerHTML = `
+        <h2>Кто подарил тебе этот квест?</h2>
+        <input id="answer">
+        <br>
+        <button onclick="check('евгений','I')">Ответить</button>
+        `;
+    }
+
+    else if(step === 7){
+        screen.innerHTML = `
+        <h2>Ты собрала буквы: ${letters}</h2>
+        <p>Введи слово полностью:</p>
+        <input id="final">
+        <br>
+        <button onclick="finalCheck()">Открыть</button>
+        `;
+    }
+}
+
+function replay(track){
+    document.getElementById("music").src = track;
+    document.getElementById("music").play();
+}
+
+function check(correct, letter){
+    let answer = document.getElementById("answer").value.toLowerCase().trim();
+
+    if(answer === correct){
+        letters += letter;
+        next();
+    } else {
+        alert("Попробуй ещё раз ❤️");
+    }
+}
+
+function finalCheck(){
+    let finalWord = document.getElementById("final").value.toUpperCase().trim();
+
+    if(finalWord === "HERZLIHZ"){
+        document.getElementById("heartbeat").play();
+        document.getElementById("screen").innerHTML = `
+        <h1>Herzlichen Glückwunsch</h1>
+        <p>Du bist mein Herz.</p>
+        <p>С 8 марта ❤️</p>
+        `;
+    } else if(finalWord === "HERZLICH"){
+        document.getElementById("heartbeat").play();
+        document.getElementById("screen").innerHTML = `
+        <h1>Herzlichen Glückwunsch</h1>
+        <p>Du bist mein Herz.</p>
+        <p>С 8 марта ❤️</p>
+        `;
+    } else {
+        alert("Подумай ещё...");
+    }
+}
+
+</script>
+
+</body>
+</html>
