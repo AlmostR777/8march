@@ -2,206 +2,271 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>8 März ❤️</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HERZLICH Quest</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: radial-gradient(circle at top, #1a0000, #000000 70%);
-    color: #ff4d4d;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    overflow: hidden;
+body{
+margin:0;
+font-family:'Orbitron',sans-serif;
+color:white;
+text-align:center;
+min-height:100vh;
+background:linear-gradient(135deg,#000000,#1a0033,#330033,#000000);
+background-size:400% 400%;
+animation:bgMove 15s ease infinite;
+overflow-x:hidden;
 }
 
-.container {
-    max-width: 750px;
-    text-align: center;
-    animation: fadeIn 1s ease-in-out;
-    z-index: 2;
+@keyframes bgMove{
+0%{background-position:0% 50%}
+50%{background-position:100% 50%}
+100%{background-position:0% 50%}
 }
 
-h2 { margin-bottom: 20px; }
-
-input {
-    padding: 10px;
-    background: black;
-    border: 1px solid #ff4d4d;
-    color: #ff4d4d;
-    width: 60%;
+.glitch{
+font-size:32px;
+position:relative;
+animation:glitch 1s infinite;
+margin-top:40px;
 }
 
-button {
-    padding: 10px 20px;
-    margin: 10px;
-    background: linear-gradient(45deg,#8b0000,#ff0000);
-    border: none;
-    color: white;
-    cursor: pointer;
-    transition: 0.3s;
+@keyframes glitch{
+0%{text-shadow:2px 2px #ff00ff,-2px -2px #00ffff}
+50%{text-shadow:-2px 2px #ff00ff,2px -2px #00ffff}
+100%{text-shadow:2px -2px #ff00ff,-2px 2px #00ffff}
 }
 
-button:hover {
-    transform: scale(1.05);
+.container{
+background:rgba(0,0,0,0.6);
+margin:40px auto;
+padding:30px;
+max-width:700px;
+border-radius:20px;
+box-shadow:0 0 30px rgba(255,0,255,0.4);
+backdrop-filter:blur(10px);
 }
 
-.option-btn {
-    display: block;
-    width: 60%;
-    margin: 10px auto;
+button{
+background:linear-gradient(45deg,#ff0080,#8000ff);
+border:none;
+color:white;
+padding:12px 20px;
+margin:8px;
+border-radius:12px;
+cursor:pointer;
+transition:0.3s;
 }
 
-@keyframes fadeIn {
-    from {opacity:0; transform: translateY(10px);}
-    to {opacity:1; transform: translateY(0);}
+button:hover{
+transform:scale(1.1);
+box-shadow:0 0 15px #ff00ff;
 }
 
-/* Летающие сердечки */
-.heart {
-    position: absolute;
-    color: rgba(255,0,0,0.3);
-    animation: float 8s linear infinite;
-    font-size: 20px;
+input{
+padding:10px;
+border-radius:8px;
+border:none;
+margin-top:10px;
+width:70%;
 }
 
-@keyframes float {
-    from { transform: translateY(100vh); }
-    to { transform: translateY(-10vh); }
+.hearts{
+position:fixed;
+width:100%;
+height:100%;
+pointer-events:none;
+top:0;
+left:0;
+}
+
+.heart{
+position:absolute;
+color:#ff66cc;
+animation:float 8s linear infinite;
+}
+
+@keyframes float{
+0%{transform:translateY(100vh);opacity:0}
+50%{opacity:1}
+100%{transform:translateY(-10vh);opacity:0}
 }
 </style>
 </head>
-
 <body>
 
-<div class="container" id="screen">
-    <h2>Liebe beginnt nicht mit Worten...</h2>
-    <button onclick="next()">Weiter</button>
+<div class="hearts" id="hearts"></div>
+
+<h1 class="glitch">HERZLICH 💖 QUEST</h1>
+
+<div class="container">
+<div id="question"></div>
+<div id="answers"></div>
+<div id="result"></div>
 </div>
 
-<audio id="music"></audio>
-<audio id="heartbeat" src="heartbeat.mp3"></audio>
-
 <script>
-
-let step = 0;
-let letters = "";
+let score=0;
+let current=0;
 
 function normalize(text){
-    return text.toLowerCase().trim();
+return text.toLowerCase().replace(/ё/g,"е").trim();
 }
 
-function checkText(answers, letter){
-    let val = normalize(document.getElementById("answer").value);
-    if(answers.includes(val)){
-        letters += letter;
-        next();
-    } else {
-        alert("Попробуй ещё ❤️");
-    }
+const questions=[
+
+//1
+{type:"text",
+q:"Как переводится HERZLICH?",
+a:["сердечно","сердечный","heartfelt"]},
+
+//2
+{type:"text",
+q:"Кто подарил тебе этот квест? 😉",
+a:["евгений","evgeniy","eugene"]},
+
+//3 Аудио
+{type:"audio",
+q:"Угадай песню по аудио 🎧 (Audio 1)",
+file:"audio1.mp3",
+a:["du hast"]},
+
+//4 Аудио
+{type:"audio",
+q:"Угадай песню по аудио 🎧 (Audio 2)",
+file:"audio2.mp3",
+a:["sonne"]},
+
+//5 выбор
+{type:"choice",
+q:"В какой федеральной земле находится Берлин?",
+options:["Бавария","Саксония","Берлин — отдельная земля","Гессен"],
+correct:2},
+
+//6
+{type:"choice",
+q:"Какой город в Грузии считается древнейшим?",
+options:["Батуми","Тбилиси","Мцхета","Кутаиси"],
+correct:2},
+
+//7
+{type:"choice",
+q:"Какое озеро находится в Армении?",
+options:["Балатон","Севан","Байкал","Иссык-Куль"],
+correct:1},
+
+//8
+{type:"choice",
+q:"Какой город называют 'городом ветров'?",
+options:["Баку","Ереван","Тбилиси","Гамбург"],
+correct:0},
+
+//9
+{type:"text",
+q:"Как называется самая высокая гора Германии?",
+a:["цугшпитце","zugspitze"]},
+
+//10
+{type:"text",
+q:"Как называется традиционный грузинский хлеб?",
+a:["шоти","shoti"]},
+
+//11
+{type:"text",
+q:"Как называется армянский коньяк мирового бренда?",
+a:["арарат","ararat"]},
+
+//12
+{type:"text",
+q:"В каком году образовалась группа Rammstein?",
+a:["1994"]},
+
+//13
+{type:"text",
+q:"Как называется столица Азербайджана?",
+a:["баку","baku"]},
+
+//14
+{type:"text",
+q:"Как по-немецки будет 'любовь'?",
+a:["liebe"]},
+
+//15 финал
+{type:"text",
+q:"Введи финальное кодовое слово ❤️",
+a:["herzlich"]}
+
+];
+
+function showQuestion(){
+const q=questions[current];
+document.getElementById("result").innerHTML="";
+document.getElementById("question").innerHTML="<h2>"+q.q+"</h2>";
+let answersDiv=document.getElementById("answers");
+answersDiv.innerHTML="";
+
+if(q.type==="text"){
+answersDiv.innerHTML='<input id="inputAnswer"><br><button onclick="checkText()">Ответить</button>';
 }
 
-function checkOption(letter){
-    letters += letter;
-    next();
+if(q.type==="audio"){
+answersDiv.innerHTML=
+'<audio controls src="'+q.file+'"></audio><br>'+
+'<input id="inputAnswer"><br>'+
+'<button onclick="checkText()">Ответить</button>';
 }
 
-function replay(track){
-    let music = document.getElementById("music");
-    music.src = track;
-    music.play();
+if(q.type==="choice"){
+q.options.forEach((opt,i)=>{
+answersDiv.innerHTML+=
+'<button onclick="checkChoice('+i+')">'+opt+'</button><br>';
+});
+}
+}
+
+function checkText(){
+let val=normalize(document.getElementById("inputAnswer").value);
+let correct=questions[current].a.map(normalize);
+if(correct.includes(val)){
+next();
+}else{
+document.getElementById("result").innerHTML="❌ Попробуй ещё раз";
+}
+}
+
+function checkChoice(i){
+if(i===questions[current].correct){
+next();
+}else{
+document.getElementById("result").innerHTML="❌ Неа 😉";
+}
 }
 
 function next(){
-    step++;
-    const s = document.getElementById("screen");
-
-    if(step === 1){
-        replay("track1.mp3");
-        s.innerHTML = `
-        <h2>🎧 Угадай песню по аудио</h2>
-        <button onclick="replay('track1.mp3')">▶ Слушать ещё раз</button><br>
-        <input id="answer"><br>
-        <button onclick="checkText(['sonne'],'H')">Ответить</button>`;
-    }
-
-    else if(step === 2){
-        s.innerHTML = `
-        <h2>Что означает "Fernweh"?</h2>
-        <button class="option-btn" onclick="checkOption('E')">Тоска по путешествиям</button>
-        <button class="option-btn" onclick="alert('Нет ❤️')">Тоска по дому</button>
-        <button class="option-btn" onclick="alert('Нет ❤️')">Страх высоты</button>`;
-    }
-
-    else if(step === 3){
-        s.innerHTML = `
-        <h2>В каком городе образовалась группа?</h2>
-        <input id="answer"><br>
-        <button onclick="checkText(['berlin','берлин'],'R')">Ответить</button>`;
-    }
-
-    else if(step === 4){
-        replay("track2.mp3");
-        s.innerHTML = `
-        <h2>🎧 Угадай песню по свисту</h2>
-        <button onclick="replay('track2.mp3')">▶ Слушать ещё раз</button><br>
-        <input id="answer"><br>
-        <button onclick="checkText(['engel'],'Z')">Ответить</button>`;
-    }
-
-    else if(step === 5){
-        s.innerHTML = `
-        <h2>Как переводится "Herz"?</h2>
-        <input id="answer"><br>
-        <button onclick="checkText(['сердце','heart'],'L')">Ответить</button>`;
-    }
-
-    else if(step === 6){
-        s.innerHTML = `
-        <h2>Кто вокалист группы?</h2>
-        <input id="answer"><br>
-        <button onclick="checkText(['till lindemann','till','линдеманн','тилль линдеманн'],'I')">Ответить</button>`;
-    }
-
-    else if(step === 7){
-        s.innerHTML = `
-        <h2>Как называется группа?</h2>
-        <input id="answer"><br>
-        <button onclick="checkText(['rammstein'],'C')">Ответить</button>`;
-    }
-
-    else if(step === 8){
-        s.innerHTML = `
-        <h2>Ты собрала буквы: ${letters}</h2>
-        <p>Введи слово полностью:</p>
-        <input id="final"><br>
-        <button onclick="finalCheck()">Открыть</button>`;
-    }
+score++;
+current++;
+if(current<questions.length){
+showQuestion();
+}else{
+document.getElementById("question").innerHTML="<h2>Ты прошла квест! 💖</h2>";
+document.getElementById("answers").innerHTML="";
+document.getElementById("result").innerHTML="Евгений тебя любит ❤️";
+}
 }
 
-function finalCheck(){
-    let val = normalize(document.getElementById("final").value);
-    if(val === "herzlich"){
-        document.getElementById("heartbeat").play();
-        document.getElementById("screen").innerHTML = `
-        <h1>Herzlichen Glückwunsch ❤️</h1>
-        <p>Du bist mein Herz.</p>
-        <p>С 8 марта 💐</p>`;
-    } else {
-        alert("Подумай ещё ❤️");
-    }
-}
+showQuestion();
 
-/* Сердечки */
-for(let i=0;i<20;i++){
-    let h=document.createElement("div");
-    h.className="heart";
-    h.style.left=Math.random()*100+"vw";
-    h.style.animationDuration=(5+Math.random()*5)+"s";
-    h.innerHTML="❤";
-    document.body.appendChild(h);
+// сердечки
+for(let i=0;i<30;i++){
+let heart=document.createElement("div");
+heart.className="heart";
+heart.innerHTML="❤";
+heart.style.left=Math.random()*100+"%";
+heart.style.animationDuration=(5+Math.random()*5)+"s";
+heart.style.fontSize=(10+Math.random()*20)+"px";
+document.getElementById("hearts").appendChild(heart);
 }
 </script>
 
