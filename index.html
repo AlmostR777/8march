@@ -2,54 +2,78 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>8 März</title>
+<title>8 März ❤️</title>
 
 <style>
 body {
     margin: 0;
-    background: black;
-    color: #8b0000;
     font-family: Arial, sans-serif;
+    background: radial-gradient(circle at top, #1a0000, #000000 70%);
+    color: #ff4d4d;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    text-align: center;
+    overflow: hidden;
 }
 
 .container {
-    max-width: 700px;
-    animation: fadeIn 1.5s ease-in-out;
+    max-width: 750px;
+    text-align: center;
+    animation: fadeIn 1s ease-in-out;
+    z-index: 2;
 }
+
+h2 { margin-bottom: 20px; }
 
 input {
     padding: 10px;
-    margin-top: 20px;
     background: black;
-    border: 1px solid #8b0000;
-    color: #8b0000;
+    border: 1px solid #ff4d4d;
+    color: #ff4d4d;
+    width: 60%;
 }
 
 button {
     padding: 10px 20px;
-    margin-top: 15px;
-    background: #8b0000;
+    margin: 10px;
+    background: linear-gradient(45deg,#8b0000,#ff0000);
     border: none;
-    color: black;
+    color: white;
     cursor: pointer;
     transition: 0.3s;
 }
 
 button:hover {
-    background: red;
+    transform: scale(1.05);
+}
+
+.option-btn {
+    display: block;
+    width: 60%;
+    margin: 10px auto;
 }
 
 @keyframes fadeIn {
-    from {opacity: 0;}
-    to {opacity: 1;}
+    from {opacity:0; transform: translateY(10px);}
+    to {opacity:1; transform: translateY(0);}
+}
+
+/* Летающие сердечки */
+.heart {
+    position: absolute;
+    color: rgba(255,0,0,0.3);
+    animation: float 8s linear infinite;
+    font-size: 20px;
+}
+
+@keyframes float {
+    from { transform: translateY(100vh); }
+    to { transform: translateY(-10vh); }
 }
 </style>
 </head>
+
 <body>
 
 <div class="container" id="screen">
@@ -65,123 +89,120 @@ button:hover {
 let step = 0;
 let letters = "";
 
-function next() {
-    const screen = document.getElementById("screen");
-    step++;
-
-    if(step === 1){
-        document.getElementById("music").src = "track1.mp3";
-        document.getElementById("music").play();
-
-        screen.innerHTML = `
-        <h2>Прослушай аудио и угадай название песни</h2>
-        <button onclick="replay('track1.mp3')">▶ Слушать ещё раз</button>
-        <br>
-        <input id="answer">
-        <br>
-        <button onclick="check('sonne','H')">Ответить</button>
-        `;
-    }
-
-    else if(step === 2){
-        screen.innerHTML = `
-        <h2>Что означает слово "Fernweh"?</h2>
-        <input id="answer">
-        <br>
-        <button onclick="check('тоска по путешествиям','E')">Ответить</button>
-        `;
-    }
-
-    else if(step === 3){
-        screen.innerHTML = `
-        <h2>В каком городе образовалась группа?</h2>
-        <input id="answer">
-        <br>
-        <button onclick="check('berlin','R')">Ответить</button>
-        `;
-    }
-
-    else if(step === 4){
-        document.getElementById("music").src = "track2.mp3";
-        document.getElementById("music").play();
-
-        screen.innerHTML = `
-        <h2>Прослушай аудио и угадай название песни</h2>
-        <button onclick="replay('track2.mp3')">▶ Слушать ещё раз</button>
-        <br>
-        <input id="answer">
-        <br>
-        <button onclick="check('engel','Z')">Ответить</button>
-        `;
-    }
-
-    else if(step === 5){
-        screen.innerHTML = `
-        <h2>Как переводится слово "Herz"?</h2>
-        <input id="answer">
-        <br>
-        <button onclick="check('сердце','L')">Ответить</button>
-        `;
-    }
-
-    else if(step === 6){
-        screen.innerHTML = `
-        <h2>Кто подарил тебе этот квест?</h2>
-        <input id="answer">
-        <br>
-        <button onclick="check('евгений','I')">Ответить</button>
-        `;
-    }
-
-    else if(step === 7){
-        screen.innerHTML = `
-        <h2>Ты собрала буквы: ${letters}</h2>
-        <p>Введи слово полностью:</p>
-        <input id="final">
-        <br>
-        <button onclick="finalCheck()">Открыть</button>
-        `;
-    }
+function normalize(text){
+    return text.toLowerCase().trim();
 }
 
-function replay(track){
-    document.getElementById("music").src = track;
-    document.getElementById("music").play();
-}
-
-function check(correct, letter){
-    let answer = document.getElementById("answer").value.toLowerCase().trim();
-
-    if(answer === correct){
+function checkText(answers, letter){
+    let val = normalize(document.getElementById("answer").value);
+    if(answers.includes(val)){
         letters += letter;
         next();
     } else {
-        alert("Попробуй ещё раз ❤️");
+        alert("Попробуй ещё ❤️");
+    }
+}
+
+function checkOption(letter){
+    letters += letter;
+    next();
+}
+
+function replay(track){
+    let music = document.getElementById("music");
+    music.src = track;
+    music.play();
+}
+
+function next(){
+    step++;
+    const s = document.getElementById("screen");
+
+    if(step === 1){
+        replay("track1.mp3");
+        s.innerHTML = `
+        <h2>🎧 Угадай песню по аудио</h2>
+        <button onclick="replay('track1.mp3')">▶ Слушать ещё раз</button><br>
+        <input id="answer"><br>
+        <button onclick="checkText(['sonne'],'H')">Ответить</button>`;
+    }
+
+    else if(step === 2){
+        s.innerHTML = `
+        <h2>Что означает "Fernweh"?</h2>
+        <button class="option-btn" onclick="checkOption('E')">Тоска по путешествиям</button>
+        <button class="option-btn" onclick="alert('Нет ❤️')">Тоска по дому</button>
+        <button class="option-btn" onclick="alert('Нет ❤️')">Страх высоты</button>`;
+    }
+
+    else if(step === 3){
+        s.innerHTML = `
+        <h2>В каком городе образовалась группа?</h2>
+        <input id="answer"><br>
+        <button onclick="checkText(['berlin','берлин'],'R')">Ответить</button>`;
+    }
+
+    else if(step === 4){
+        replay("track2.mp3");
+        s.innerHTML = `
+        <h2>🎧 Угадай песню по свисту</h2>
+        <button onclick="replay('track2.mp3')">▶ Слушать ещё раз</button><br>
+        <input id="answer"><br>
+        <button onclick="checkText(['engel'],'Z')">Ответить</button>`;
+    }
+
+    else if(step === 5){
+        s.innerHTML = `
+        <h2>Как переводится "Herz"?</h2>
+        <input id="answer"><br>
+        <button onclick="checkText(['сердце','heart'],'L')">Ответить</button>`;
+    }
+
+    else if(step === 6){
+        s.innerHTML = `
+        <h2>Кто вокалист группы?</h2>
+        <input id="answer"><br>
+        <button onclick="checkText(['till lindemann','till','линдеманн','тилль линдеманн'],'I')">Ответить</button>`;
+    }
+
+    else if(step === 7){
+        s.innerHTML = `
+        <h2>Как называется группа?</h2>
+        <input id="answer"><br>
+        <button onclick="checkText(['rammstein'],'C')">Ответить</button>`;
+    }
+
+    else if(step === 8){
+        s.innerHTML = `
+        <h2>Ты собрала буквы: ${letters}</h2>
+        <p>Введи слово полностью:</p>
+        <input id="final"><br>
+        <button onclick="finalCheck()">Открыть</button>`;
     }
 }
 
 function finalCheck(){
-    let finalWord = document.getElementById("final").value.toUpperCase().trim();
-
-    if(finalWord === "HERZLIHZ"){
+    let val = normalize(document.getElementById("final").value);
+    if(val === "herzlich"){
         document.getElementById("heartbeat").play();
         document.getElementById("screen").innerHTML = `
-        <h1>Herzlichen Glückwunsch</h1>
+        <h1>Herzlichen Glückwunsch ❤️</h1>
         <p>Du bist mein Herz.</p>
-        <p>С 8 марта ❤️</p>
-        `;
-    } else if(finalWord === "HERZLICH"){
-        document.getElementById("heartbeat").play();
-        document.getElementById("screen").innerHTML = `
-        <h1>Herzlichen Glückwunsch</h1>
-        <p>Du bist mein Herz.</p>
-        <p>С 8 марта ❤️</p>
-        `;
+        <p>С 8 марта 💐</p>`;
     } else {
-        alert("Подумай ещё...");
+        alert("Подумай ещё ❤️");
     }
 }
 
+/* Сердечки */
+for(let i=0;i<20;i++){
+    let h=document.createElement("div");
+    h.className="heart";
+    h.style.left=Math.random()*100+"vw";
+    h.style.animationDuration=(5+Math.random()*5)+"s";
+    h.innerHTML="❤";
+    document.body.appendChild(h);
+}
 </script>
 
 </body>
