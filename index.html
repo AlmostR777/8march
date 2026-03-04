@@ -13,9 +13,10 @@ font-family:'Orbitron',sans-serif;
 color:white;
 text-align:center;
 min-height:100vh;
-background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
+background:linear-gradient(-45deg,#0f0c29,#302b63,#ff0080,#24243e);
 background-size:400% 400%;
-animation:bg 15s ease infinite;
+animation:bg 18s ease infinite;
+overflow:hidden;
 }
 
 @keyframes bg{
@@ -43,6 +44,7 @@ padding:30px;
 max-width:700px;
 border-radius:20px;
 box-shadow:0 0 30px rgba(255,0,255,0.3);
+backdrop-filter:blur(10px);
 }
 
 button{
@@ -74,9 +76,33 @@ font-size:22px;
 letter-spacing:10px;
 color:#ff66cc;
 }
+
+/* Сердечки */
+.hearts{
+position:fixed;
+width:100%;
+height:100%;
+top:0;
+left:0;
+pointer-events:none;
+}
+
+.heart{
+position:absolute;
+color:#ff66cc;
+animation:float 8s linear infinite;
+}
+
+@keyframes float{
+0%{transform:translateY(100vh);opacity:0}
+50%{opacity:1}
+100%{transform:translateY(-10vh);opacity:0}
+}
 </style>
 </head>
 <body>
+
+<div class="hearts" id="hearts"></div>
 
 <h1 class="glitch">Ein besonderer Quest zum 8. März für Alisa 💖</h1>
 
@@ -106,14 +132,14 @@ const questions=[
 
 //1
 {type:"text",
-q:"Как переводится слово 'Liebe'?",
-a:["любовь"],
+q:"Как переводится слово 'Glück'?",
+a:["счастье"],
 letter:null},
 
 //2
 {type:"text",
 q:"Кто подарил тебе этот квест? 😉",
-a:["евгений","evgeniy","eugene"],
+a:["евгений","evgeniy","eugene","женя"],
 letter:"h"},
 
 //3 AUDIO Sonne
@@ -152,10 +178,9 @@ correct:2,
 letter:null},
 
 //8
-{type:"choice",
-q:"Какой нефтяной проект сделал Баку стратегически важным?",
-options:["BTC pipeline","Nord Stream","Blue Stream","South Stream"],
-correct:0,
+{type:"text",
+q:"Какая твоя любимая песня Rammstein? 😏",
+a:["*"],
 letter:"l"},
 
 //9
@@ -172,26 +197,26 @@ letter:"i"},
 
 //11
 {type:"text",
-q:"Как по-немецки будет 'солнце'?",
-a:["sonne"],
-letter:null},
-
-//12
-{type:"text",
 q:"Столица Армении?",
 a:["ереван","yerevan"],
 letter:null},
 
-//13
+//12
 {type:"text",
 q:"Город ветров?",
 a:["баку","baku"],
 letter:"c"},
 
-//14
+//13
 {type:"text",
 q:"Традиционный грузинский хлеб?",
 a:["шоти","shoti"],
+letter:null},
+
+//14
+{type:"text",
+q:"Как по-немецки будет 'сердце'?",
+a:["herz"],
 letter:null},
 
 //15 финал
@@ -239,6 +264,13 @@ updateLetters();
 
 function checkText(){
 let val=normalize(document.getElementById("inputAnswer").value);
+
+if(questions[current].a[0]==="*"){
+giveLetter(questions[current].letter);
+next();
+return;
+}
+
 let correct=questions[current].a.map(normalize);
 
 if(correct.includes(val)){
@@ -263,14 +295,25 @@ current++;
 if(current<questions.length){
 showQuestion();
 }else{
-document.getElementById("question").innerHTML="<h2>Ты прошла квест 💖</h2>";
+document.getElementById("question").innerHTML="<h2>Ты прошла квест 💖<br>С 8 Марта!</h2>";
 document.getElementById("answers").innerHTML="";
-document.getElementById("result").innerHTML="Евгений тебя очень любит ❤️";
+document.getElementById("letters").innerHTML="";
 }
 }
 
 updateLetters();
 showQuestion();
+
+/* Генерация сердечек */
+for(let i=0;i<35;i++){
+let heart=document.createElement("div");
+heart.className="heart";
+heart.innerHTML="❤";
+heart.style.left=Math.random()*100+"%";
+heart.style.animationDuration=(5+Math.random()*5)+"s";
+heart.style.fontSize=(10+Math.random()*20)+"px";
+document.getElementById("hearts").appendChild(heart);
+}
 
 </script>
 </body>
