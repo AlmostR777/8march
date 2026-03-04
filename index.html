@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HERZLICH Quest</title>
-
+<title>8 März Quest</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
@@ -14,205 +13,208 @@ font-family:'Orbitron',sans-serif;
 color:white;
 text-align:center;
 min-height:100vh;
-background:linear-gradient(135deg,#000000,#1a0033,#330033,#000000);
+background:linear-gradient(135deg,#0f0c29,#302b63,#24243e);
 background-size:400% 400%;
-animation:bgMove 15s ease infinite;
-overflow-x:hidden;
+animation:bg 15s ease infinite;
 }
 
-@keyframes bgMove{
+@keyframes bg{
 0%{background-position:0% 50%}
 50%{background-position:100% 50%}
 100%{background-position:0% 50%}
 }
 
 .glitch{
-font-size:32px;
-position:relative;
+font-size:28px;
+margin-top:30px;
 animation:glitch 1s infinite;
-margin-top:40px;
 }
 
 @keyframes glitch{
-0%{text-shadow:2px 2px #ff00ff,-2px -2px #00ffff}
-50%{text-shadow:-2px 2px #ff00ff,2px -2px #00ffff}
-100%{text-shadow:2px -2px #ff00ff,-2px 2px #00ffff}
+0%{text-shadow:2px 2px red,-2px -2px cyan}
+50%{text-shadow:-2px 2px red,2px -2px cyan}
+100%{text-shadow:2px -2px red,-2px 2px cyan}
 }
 
 .container{
 background:rgba(0,0,0,0.6);
-margin:40px auto;
+margin:30px auto;
 padding:30px;
 max-width:700px;
 border-radius:20px;
-box-shadow:0 0 30px rgba(255,0,255,0.4);
-backdrop-filter:blur(10px);
+box-shadow:0 0 30px rgba(255,0,255,0.3);
 }
 
 button{
 background:linear-gradient(45deg,#ff0080,#8000ff);
 border:none;
 color:white;
-padding:12px 20px;
+padding:10px 18px;
 margin:8px;
-border-radius:12px;
+border-radius:10px;
 cursor:pointer;
 transition:0.3s;
 }
 
 button:hover{
 transform:scale(1.1);
-box-shadow:0 0 15px #ff00ff;
 }
 
 input{
-padding:10px;
+padding:8px;
 border-radius:8px;
 border:none;
 margin-top:10px;
 width:70%;
 }
 
-.hearts{
-position:fixed;
-width:100%;
-height:100%;
-pointer-events:none;
-top:0;
-left:0;
-}
-
-.heart{
-position:absolute;
+#letters{
+margin-top:20px;
+font-size:22px;
+letter-spacing:10px;
 color:#ff66cc;
-animation:float 8s linear infinite;
-}
-
-@keyframes float{
-0%{transform:translateY(100vh);opacity:0}
-50%{opacity:1}
-100%{transform:translateY(-10vh);opacity:0}
 }
 </style>
 </head>
 <body>
 
-<div class="hearts" id="hearts"></div>
+<h1 class="glitch">Ein besonderer Quest zum 8. März für Alisa 💖</h1>
 
-<h1 class="glitch">Ein Quest zum 8. März für Alisa 💖</h1>
-  
 <div class="container">
 <div id="question"></div>
 <div id="answers"></div>
 <div id="result"></div>
+<div id="letters">_ _ _ _ _ _ _ _</div>
 </div>
 
 <script>
-let score=0;
+
 let current=0;
+
+const finalWord="herzlich";
+let collected=["_","_","_","_","_","_","_","_"];
 
 function normalize(text){
 return text.toLowerCase().replace(/ё/g,"е").trim();
+}
+
+function updateLetters(){
+document.getElementById("letters").innerText=collected.join(" ");
 }
 
 const questions=[
 
 //1
 {type:"text",
-q:"Как переводится HERZLICH?",
-a:["сердечно","сердечный","heartfelt"]},
+q:"Как переводится слово 'Liebe'?",
+a:["любовь"],
+letter:null},
 
 //2
 {type:"text",
 q:"Кто подарил тебе этот квест? 😉",
-a:["евгений","evgeniy","eugene"]},
+a:["евгений","evgeniy","eugene"],
+letter:"h"},
 
-//3 Аудио
+//3 AUDIO Sonne
 {type:"audio",
-q:"Угадай песню по аудио 🎧 (Audio 1)",
-file:"audio1.mp3",
-a:["du hast"]},
+q:"Угадай песню по аудио 🎧",
+file:"track1.mp3",
+a:["sonne"],
+letter:"e"},
 
-//4 Аудио
+//4 AUDIO Engel
 {type:"audio",
-q:"Угадай песню по аудио 🎧 (Audio 2)",
-file:"audio2.mp3",
-a:["sonne"]},
+q:"Угадай песню по аудио 🎧",
+file:"track2.mp3",
+a:["engel"],
+letter:"r"},
 
-//5 выбор
+//5
 {type:"choice",
-q:"В какой федеральной земле находится Берлин?",
-options:["Бавария","Саксония","Берлин — отдельная земля","Гессен"],
-correct:2},
+q:"Берлин — это...",
+options:["город в Баварии","отдельная федеральная земля","часть Саксонии","город в Австрии"],
+correct:1,
+letter:null},
 
 //6
 {type:"choice",
-q:"Какой город в Грузии считается древнейшим?",
-options:["Батуми","Тбилиси","Мцхета","Кутаиси"],
-correct:2},
+q:"Какой монастырь вырублен в скале в Грузии?",
+options:["Гелати","Вардзия","Светицховели","Алаверди"],
+correct:1,
+letter:"z"},
 
 //7
 {type:"choice",
-q:"Какое озеро находится в Армении?",
-options:["Балатон","Севан","Байкал","Иссык-Куль"],
-correct:1},
+q:"Какой древний храм стоит на берегу озера Севан?",
+options:["Гегард","Хор Вирап","Севанаванк","Татев"],
+correct:2,
+letter:null},
 
 //8
 {type:"choice",
-q:"Какой город называют 'городом ветров'?",
-options:["Баку","Ереван","Тбилиси","Гамбург"],
-correct:0},
+q:"Какой нефтяной проект сделал Баку стратегически важным?",
+options:["BTC pipeline","Nord Stream","Blue Stream","South Stream"],
+correct:0,
+letter:"l"},
 
 //9
 {type:"text",
-q:"Как называется самая высокая гора Германии?",
-a:["цугшпитце","zugspitze"]},
+q:"Самая высокая гора Германии?",
+a:["цугшпитце","zugspitze"],
+letter:null},
 
 //10
 {type:"text",
-q:"Как называется традиционный грузинский хлеб?",
-a:["шоти","shoti"]},
+q:"В каком году образовалась Rammstein?",
+a:["1994"],
+letter:"i"},
 
 //11
 {type:"text",
-q:"Как называется армянский коньяк мирового бренда?",
-a:["арарат","ararat"]},
+q:"Как по-немецки будет 'солнце'?",
+a:["sonne"],
+letter:null},
 
 //12
 {type:"text",
-q:"В каком году образовалась группа Rammstein?",
-a:["1994"]},
+q:"Столица Армении?",
+a:["ереван","yerevan"],
+letter:null},
 
 //13
 {type:"text",
-q:"Как называется столица Азербайджана?",
-a:["баку","baku"]},
+q:"Город ветров?",
+a:["баку","baku"],
+letter:"c"},
 
 //14
 {type:"text",
-q:"Как по-немецки будет 'любовь'?",
-a:["liebe"]},
+q:"Традиционный грузинский хлеб?",
+a:["шоти","shoti"],
+letter:null},
 
 //15 финал
 {type:"text",
 q:"Введи финальное кодовое слово ❤️",
-a:["herzlich"]}
+a:["herzlich"],
+letter:null}
 
 ];
 
 function showQuestion(){
-const q=questions[current];
+let q=questions[current];
 document.getElementById("result").innerHTML="";
 document.getElementById("question").innerHTML="<h2>"+q.q+"</h2>";
-let answersDiv=document.getElementById("answers");
-answersDiv.innerHTML="";
+let answers=document.getElementById("answers");
+answers.innerHTML="";
 
 if(q.type==="text"){
-answersDiv.innerHTML='<input id="inputAnswer"><br><button onclick="checkText()">Ответить</button>';
+answers.innerHTML='<input id="inputAnswer"><br><button onclick="checkText()">Ответить</button>';
 }
 
 if(q.type==="audio"){
-answersDiv.innerHTML=
+answers.innerHTML=
 '<audio controls src="'+q.file+'"></audio><br>'+
 '<input id="inputAnswer"><br>'+
 '<button onclick="checkText()">Ответить</button>';
@@ -220,16 +222,27 @@ answersDiv.innerHTML=
 
 if(q.type==="choice"){
 q.options.forEach((opt,i)=>{
-answersDiv.innerHTML+=
-'<button onclick="checkChoice('+i+')">'+opt+'</button><br>';
+answers.innerHTML+='<button onclick="checkChoice('+i+')">'+opt+'</button><br>';
 });
+}
+}
+
+function giveLetter(letter){
+if(letter){
+let index=finalWord.indexOf(letter);
+if(index!==-1 && collected[index]==="_"){
+collected[index]=letter;
+updateLetters();
+}
 }
 }
 
 function checkText(){
 let val=normalize(document.getElementById("inputAnswer").value);
 let correct=questions[current].a.map(normalize);
+
 if(correct.includes(val)){
+giveLetter(questions[current].letter);
 next();
 }else{
 document.getElementById("result").innerHTML="❌ Попробуй ещё раз";
@@ -238,6 +251,7 @@ document.getElementById("result").innerHTML="❌ Попробуй ещё раз"
 
 function checkChoice(i){
 if(i===questions[current].correct){
+giveLetter(questions[current].letter);
 next();
 }else{
 document.getElementById("result").innerHTML="❌ Неа 😉";
@@ -245,30 +259,19 @@ document.getElementById("result").innerHTML="❌ Неа 😉";
 }
 
 function next(){
-score++;
 current++;
 if(current<questions.length){
 showQuestion();
 }else{
-document.getElementById("question").innerHTML="<h2>Ты прошла квест! 💖</h2>";
+document.getElementById("question").innerHTML="<h2>Ты прошла квест 💖</h2>";
 document.getElementById("answers").innerHTML="";
-document.getElementById("result").innerHTML="Евгений тебя любит ❤️";
+document.getElementById("result").innerHTML="Евгений тебя очень любит ❤️";
 }
 }
 
+updateLetters();
 showQuestion();
 
-// сердечки
-for(let i=0;i<30;i++){
-let heart=document.createElement("div");
-heart.className="heart";
-heart.innerHTML="❤";
-heart.style.left=Math.random()*100+"%";
-heart.style.animationDuration=(5+Math.random()*5)+"s";
-heart.style.fontSize=(10+Math.random()*20)+"px";
-document.getElementById("hearts").appendChild(heart);
-}
 </script>
-
 </body>
 </html>
